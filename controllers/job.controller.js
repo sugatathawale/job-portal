@@ -26,7 +26,7 @@ export const postJob = async (req, res) => {
       !companyId
     ) {
       return res.status(400).json({
-        message: "Somethin is missing.",
+        message: "Something is missing.",
         success: false,
       });
     }
@@ -91,7 +91,7 @@ export const getJobById = async (req, res) => {
 
     if (!job) {
       return res.status(404).json({
-        message: "Jobs not found.",
+        message: "Job not found.",
         success: false,
       });
     }
@@ -120,5 +120,32 @@ export const getAdminJobs = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const deleteJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const userId = req.id;
+
+    const job = await Job.findOne({ _id: jobId, created_by: userId });
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found or you do not have permission to delete this job.",
+        success: false,
+      });
+    }
+
+    await Job.findByIdAndDelete(jobId);
+    return res.status(200).json({
+      message: "Job deleted successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "An error occurred while trying to delete the job.",
+      success: false,
+    });
   }
 };
